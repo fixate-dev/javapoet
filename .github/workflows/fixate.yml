@@ -1,0 +1,44 @@
+name: Run Test with Agent
+
+on:
+  workflow_dispatch: 
+  # push:
+  #   branches: [ master ]  
+  # pull_request:
+  #   branches: [ master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+      
+    - name: Download agent from GitHub Packages
+      env:
+        AGENT_VERSION: "1.1.6"
+      run: |
+        # Download agent
+        curl -u "${{ github.actor }}:${{ secrets.GH_PACKAGES_READ_TOKEN }}" \
+          -fL "https://maven.pkg.github.com/fixate-dev/Fixate/com/example/fixate-agent/${AGENT_VERSION}/fixate-agent-${AGENT_VERSION}.jar" \
+          -o fixate-agent.jar
+
+        jar tf fixate-agent.jar
+      
+    - name: Run tests with agent
+      run: |
+         mvn test -DargLine="-javaagent:/$(pwd)/fixate-agent.jar -Xmx16g"
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results
+        path: retrofit/java-test/build/reports/
