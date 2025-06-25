@@ -211,16 +211,17 @@ public final class CodeBlockTest {
         Map<String, Object> mockMap = mock(Map.class);
         when(mockMap.get("clazz")).thenReturn(Integer.class);
         when(mockMap.containsKey("clazz")).thenReturn(true);
-        when(mockMap.keySet()).thenReturn(Set.of("clazz"));
         CodeBlock block = CodeBlock.builder().addNamed("$clazz:T\n", mockMap).build();
         assertThat(block.toString()).isEqualTo("java.lang.Integer\n");
     }
 
     @Test
     public void namedNewline1() {
-        Map<String, Object> map = new LinkedHashMap<>();
-        map.put("clazz", Integer.class);
-        CodeBlock block = CodeBlock.builder().addNamed("$clazz:T\n", map).build();
+        @SuppressWarnings("unchecked")
+        Map<String, Object> mockMap = mock(Map.class);
+        when(mockMap.containsKey("clazz")).thenReturn(true);
+        when(mockMap.get("clazz")).thenReturn(Integer.class);
+        CodeBlock block = CodeBlock.builder().addNamed("$clazz:T\n", mockMap).build();
         assertThat(block.toString()).isEqualTo("java.lang.Integer\n");
     }
 
