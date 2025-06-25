@@ -21,3 +21,10 @@ classes
 obj
 
 .DS_Store
+json
+justfile
+src/main/java/com/truth-1.4.4.jar
+tags
+fixate-agent.jar
+Makefile
+TAGS
