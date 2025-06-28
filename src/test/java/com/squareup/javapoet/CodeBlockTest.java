@@ -16,6 +16,8 @@
 package com.squareup.javapoet;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -142,18 +144,21 @@ public final class CodeBlockTest {
 
     @Test
     public void simpleNamedArgument() {
-        Map<String, Object> map = new LinkedHashMap<>();
-        map.put("text", "taco");
-        CodeBlock block = CodeBlock.builder().addNamed("$text:S", map).build();
+        Map<String, Object> mockMap = mock(Map.class);
+        when(mockMap.get("text")).thenReturn("taco");
+        when(mockMap.containsKey("text")).thenReturn(true);
+        CodeBlock block = CodeBlock.builder().addNamed("$text:S", mockMap).build();
         assertThat(block.toString()).isEqualTo("\"taco\"");
     }
 
     @Test
     public void repeatedNamedArgument() {
-        Map<String, Object> map = new LinkedHashMap<>();
-        map.put("text", "tacos");
+        Map<String, Object> mockMap = mock(Map.class);
+        when(mockMap.get("text")).thenReturn("tacos");
+        when(mockMap.containsKey("text")).thenReturn(true);
+        // map.put("text", "tacos");
         CodeBlock block = CodeBlock.builder()
-                .addNamed("\"I like \" + $text:S + \". Do you like \" + $text:S + \"?\"", map)
+                .addNamed("\"I like \" + $text:S + \". Do you like \" + $text:S + \"?\"", mockMap)
                 .build();
         assertThat(block.toString()).isEqualTo(
                 "\"I like \" + \"tacos\" + \". Do you like \" + \"tacos\" + \"?\"");
@@ -161,18 +166,20 @@ public final class CodeBlockTest {
 
     @Test
     public void namedAndNoArgFormat() {
-        Map<String, Object> map = new LinkedHashMap<>();
-        map.put("text", "tacos");
+        Map<String, Object> mockMap = mock(Map.class);
+        when(mockMap.get("text")).thenReturn("tacos");
+        when(mockMap.containsKey("text")).thenReturn(true);
         CodeBlock block = CodeBlock.builder()
-                .addNamed("$>\n$text:L for $$3.50", map).build();
+                .addNamed("$>\n$text:L for $$3.50", mockMap).build();
         assertThat(block.toString()).isEqualTo("\n  tacos for $3.50");
     }
 
     @Test
     public void missingNamedArgument() {
         try {
-            Map<String, Object> map = new LinkedHashMap<>();
-            CodeBlock.builder().addNamed("$text:S", map).build();
+            Map<String, Object> mockMap = mock(Map.class);
+            when(mockMap.containsKey("text")).thenReturn(false);
+            CodeBlock.builder().addNamed("$text:S", mockMap).build();
             fail();
         } catch (IllegalArgumentException expected) {
             assertThat(expected).hasMessageThat().isEqualTo("Missing named argument for $text");
@@ -182,9 +189,11 @@ public final class CodeBlockTest {
     @Test
     public void lowerCaseNamed() {
         try {
-            Map<String, Object> map = new LinkedHashMap<>();
-            map.put("Text", "tacos");
-            CodeBlock block = CodeBlock.builder().addNamed("$Text:S", map).build();
+            Map<String, Object> mockMap = mock(Map.class);
+            when(mockMap.get("Text")).thenReturn("tacos");
+            when(mockMap.containsKey("Text")).thenReturn(true);
+            when(mockMap.keySet()).thenReturn(new HashSet<>(Arrays.asList("Text")));
+            CodeBlock block = CodeBlock.builder().addNamed("$Text:S", mockMap).build();
             fail();
         } catch (IllegalArgumentException expected) {
             assertThat(expected).hasMessageThat().isEqualTo("argument 'Text' must start with a lowercase character");
@@ -193,12 +202,14 @@ public final class CodeBlockTest {
 
     @Test
     public void multipleNamedArguments() {
-        Map<String, Object> map = new LinkedHashMap<>();
-        map.put("pipe", System.class);
-        map.put("text", "tacos");
+        Map<String, Object> mockMap = mock(Map.class);
+        when(mockMap.get("text")).thenReturn("tacos");
+        when(mockMap.containsKey("text")).thenReturn(true);
+        when(mockMap.get("pipe")).thenReturn(System.class);
+        when(mockMap.containsKey("pipe")).thenReturn(true);
 
         CodeBlock block = CodeBlock.builder()
-                .addNamed("$pipe:T.out.println(\"Let's eat some $text:L\");", map)
+                .addNamed("$pipe:T.out.println(\"Let's eat some $text:L\");", mockMap)
                 .build();
 
         assertThat(block.toString()).isEqualTo(
