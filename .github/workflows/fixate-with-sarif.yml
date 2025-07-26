@@ -3,6 +3,9 @@ name: Run Fixate With SARIF Output
 on:
   workflow_dispatch:
 
+permissions:
+  security-events: write
+
 jobs:
   test:
     runs-on: ubuntu-latest
