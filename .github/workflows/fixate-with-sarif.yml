@@ -50,7 +50,7 @@ jobs:
         
         # Generate Sarif file
         pip install typer
-        python fixate_report_to_sarif_converter.py --find --out reports/sarif-report.sarif
+        python fixate_report_to_sarif_converter.py --out reports/sarif-report.sarif
 
     - name: Upload SARIF file
       uses: github/codeql-action/upload-sarif@v3
