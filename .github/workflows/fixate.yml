@@ -41,7 +41,7 @@ jobs:
       run: |
          mvn test -DargLine="-javaagent:/$(pwd)/fixate-agent.jar -Xmx16g"
          ls 
-         ls /reports
+         ls reports
 
     - name: Upload test results
       uses: actions/upload-artifact@v4
