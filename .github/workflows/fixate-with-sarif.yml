@@ -2,10 +2,6 @@ name: Run Fixate With SARIF Output
 
 on:
   workflow_dispatch:
-  # push:
-  #   branches: [ master ]
-  # pull_request:
-  #   branches: [ master ]
 
 jobs:
   test:
@@ -21,20 +17,31 @@ jobs:
         java-version: '8'
         distribution: 'zulu'
 
-    - name: Download agent from GitHub Packages
+    - name: Download agent jars from GitHub Packages
       env:
         AGENT_VERSION: "1.3.1"
       run: |
-        # Download agent
+        # Download main agent jar
         curl -u "${{ github.actor }}:${{ secrets.GH_PACKAGES_READ_TOKEN }}" \
           -fL "https://maven.pkg.github.com/fixate-dev/Fixate/com/example/fixate-agent/${AGENT_VERSION}/fixate-agent-${AGENT_VERSION}.jar" \
           -o fixate-agent.jar
 
-        jar tf fixate-agent.jar
+        # Download bootstrap jar
+        curl -u "${{ github.actor }}:${{ secrets.GH_PACKAGES_READ_TOKEN }}" \
+          -fL "https://maven.pkg.github.com/fixate-dev/Fixate/com/example/fixate-agent/${AGENT_VERSION}/fixate-agent-${AGENT_VERSION}-bootstrap.jar" \
+          -o fixate-agent-bootstrap.jar
+
+        # Verify both jars were downloaded
+        echo "Main agent jar contents:"
+        jar tf fixate-agent.jar | head -20
+        echo "Bootstrap jar contents:"
+        jar tf fixate-agent-bootstrap.jar
 
     - name: Run tests with agent
       run: |
-         mvn test -DargLine="-javaagent:/$(pwd)/fixate-agent.jar -Xmx16g"
+        mvn test -DargLine="-javaagent:/$(pwd)/fixate-agent.jar -Xmx16g"
+        ls 
+        ls ./reports/
 
     - name: Convert json report to sarif
       run: |
@@ -55,4 +62,4 @@ jobs:
       if: always()
       with:
         name: test-results
-        path: "."
+        path: ./reports/
