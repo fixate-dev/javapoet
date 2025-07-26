@@ -46,4 +46,4 @@ jobs:
       if: always()
       with:
         name: test-results
-        path: javapoet/java-test/build/reports/
+        path: javapoet/reports/
