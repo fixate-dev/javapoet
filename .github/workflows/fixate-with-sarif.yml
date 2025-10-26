@@ -22,15 +22,15 @@ jobs:
 
     - name: Download agent jars from GitHub Packages
       env:
-        AGENT_VERSION: "1.3.1"
+        AGENT_VERSION: "${{ vars.FIXATE_AGENT_VERSION }}"
       run: |
-        # Download main agent jar
-        curl -u "${{ github.actor }}:${{ secrets.GH_PACKAGES_READ_TOKEN }}" \
-          -fL "https://maven.pkg.github.com/fixate-dev/Fixate/com/example/fixate-agent/${AGENT_VERSION}/fixate-agent-${AGENT_VERSION}.jar" \
+        # Download agent
+        curl -u "${{ github.repository_owner }}:${{ secrets.FIXATE_PACKAGES_ACCESS_TOKEN }}" \
+          -L "https://maven.pkg.github.com/fixate-dev/Fixate/com/example/fixate-agent/${AGENT_VERSION}/fixate-agent-${AGENT_VERSION}.jar" \
           -o fixate-agent.jar
 
         # Download bootstrap jar
-        curl -u "${{ github.actor }}:${{ secrets.GH_PACKAGES_READ_TOKEN }}" \
+        curl -u "${{ github.repository_owner }}:${{ secrets.FIXATE_PACKAGES_ACCESS_TOKEN }}" \
           -fL "https://maven.pkg.github.com/fixate-dev/Fixate/com/example/fixate-agent/${AGENT_VERSION}/fixate-agent-${AGENT_VERSION}-bootstrap.jar" \
           -o fixate-agent-bootstrap.jar
 
